@@ -53,11 +53,9 @@ Ce projet est une application de messagerie en temps réel avec :
 
 3. Créer un fichier \`.env\` avec :
 
-\`\`\`
 - PORT=3000
 - JWT_SECRET=tonsecretpourjwt
 - MONGODB_URI=mongodb://localhost:27017/tchatbox
-\`\`\`
 
 4. Démarrer le serveur backend :
 
