@@ -1,10 +1,23 @@
-const express = require("express");
+// Importer les modules nécessaires
+const express = require('express');
+const connectDB = require('./config/db');
+const cors = require('cors');
 const http = require("http");
 const { Server } = require("socket.io");
-const cors = require("cors");
-require("dotenv").config();
 
+require("dotenv").config(); // Charger les variables d'environnement
+
+// Initialiser l'application Express
 const app = express();
+
+// Connecter à la base de données
+connectDB();
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+
+// Créer le serveur HTTP
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -13,9 +26,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
-
-app.use(cors());
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Serveur de messagerie en temps réel en ligne 🚀");
