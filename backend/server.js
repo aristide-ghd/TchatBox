@@ -5,6 +5,10 @@ const cors = require('cors');
 const http = require("http");
 const { Server } = require("socket.io");
 
+// Importer les routes
+const userRoutes = require('./routes/userRoutes');
+
+// Charger les variables d'environnement
 require("dotenv").config(); // Charger les variables d'environnement
 
 // Initialiser l'application Express
@@ -16,6 +20,9 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Routes
+app.use('/api/users', userRoutes);
 
 // Créer le serveur HTTP
 const server = http.createServer(app);

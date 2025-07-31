@@ -1,10 +1,10 @@
 const Utilisateur = require('../models/user.js');
 const jwt = require('jsonwebtoken');
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const { default: mongoose } = require("mongoose");
 
 // Fonction pour créer un nouvel utilisateur
-exports.createUser = async (req,res) => {
+const createUser = async (req,res) => {
     try{
         const data = req.body;
 
@@ -47,9 +47,84 @@ exports.createUser = async (req,res) => {
     }
 };
 
-exports.loginUser = async (req, res) => {
+//Generation d'un jeton après connexion de l'utilisateur
+const generateJwt= (identity) =>{
     try {
 
+        if (!process.env.JWT_SECRET) {
+            throw new Error("Clé JWT non définie dans le fichier .env");
+        }
+
+        // Sélectionner uniquement les informations nécessaires pour le token
+        const payload = {
+            identity: {
+                _id: identity._id, // ID de l'utilisateur
+                email: identity.email, // Email de l'utilisateur
+                role: identity.role, // Rôle de l'utilisateur
+                nom: identity.nom, // Nom de l'utilisateur
+                prenom: identity.prenom, // Prénom de l'utilisateur
+            },
+        };
+
+        // {identity} si je veux tout envoyé
+        const token = jwt.sign(
+            payload, 
+            process.env.JWT_SECRET, 
+            { expiresIn: "12h" }
+        );
+  
+        const expirationTime = new Date();
+        expirationTime.setHours(expirationTime.getHours() + 12);
+  
+        return {
+            token,
+            expiresIn: "12h",
+            expirationTime
+        };
+    }
+    catch (error) {
+        console.error("Erreur lors de la génération du token:", error.message);
+        throw error; // ← très important pour ne pas retourner undefined
+    }
+};
+
+const loginUser = async (req, res) => {
+    try {
+        // Recuperer l'email et le mot de passe depuis le corps de la requete
+        const { email, motDePasse} = req.body;
+
+        // Verifier si l'email existe dans la base de données
+        const utilisateur = await Utilisateur.findOne({email});
+
+        if (!utilisateur) {
+            return res.status(400).json({ 
+                Message: "L'email est invalide" 
+            });
+        }
+        
+        // Comparer le mot de passe fourni avec le mot de passe stocké dans la base de données
+        const mot_de_passe_correct = await bcrypt.compare(motDePasse, utilisateur.motDePasse);
+
+        if (!mot_de_passe_correct) {
+            return res.status(401).json({ 
+                Message: "Le mot de passe est incorrect. Veuillez réessayer!"
+            });
+        }
+
+        const return_token = generateJwt(utilisateur);
+
+        // console.log("Data",return_token);
+
+        res.status(200).json({ 
+            message: "Connexion réussie", 
+            data:return_token, 
+            utilisateur: {   
+                _id: utilisateur._id, 
+                pseudo: utilisateur.pseudo, 
+                email: utilisateur.email,
+                sexe: utilisateur.sexe,
+            }, 
+        });
     }
     catch (error) {
         res.status(500).json({
@@ -57,4 +132,9 @@ exports.loginUser = async (req, res) => {
             Erreur: error.message
         });
     }
-}
+};
+
+module.exports = {
+    createUser,
+    loginUser,
+};

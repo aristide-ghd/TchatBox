@@ -16,11 +16,6 @@ const messageSchema = new mongoose.Schema(
       type: String, 
       required: true 
     },
-    sexe: { 
-      type: String, 
-      enum: ["Homme", "Femme"],
-      required: true 
-    },
   },
   { 
     timestamps: true // Ajoute automatiquement createdAt et updatedAt
