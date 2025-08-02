@@ -36,7 +36,7 @@ router.post(
 
 // Route pour envoyer un message
 router.post(
-    '/envoyer', 
+    '/send', 
     authMiddleware,
     yupValidator(messageDto), 
     sendMessage

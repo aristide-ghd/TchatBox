@@ -33,9 +33,6 @@ const connexionDto = object({
 
 const messageDto = object({
   body: object({
-    senderId: string()
-      .required("L'identifiant de l'expéditeur est requis"),
-
     receivedId: string()
       .nullable(), // Peut être null pour les messages publics
 
