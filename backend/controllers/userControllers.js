@@ -13,7 +13,7 @@ const createUser = async (req,res) => {
 
         if (existingUser) {
             return res.status(400).json({
-                Message: "Un utilisateur avec cet email existe déjà."
+                message: "Un utilisateur avec cet email existe déjà."
             })
         }
 
@@ -34,14 +34,14 @@ const createUser = async (req,res) => {
         await newUser.save();
 
         res.status(200).json({
-            Message: "Utilisateur crée avec succès",
+            message: "Utilisateur crée avec succès",
             User: newUser
         })
     }
     catch (error) {
         console.error("Erreur lors de la création de l'utilisateur :", error);
         res.status(500).json({ 
-            Message: "Erreur lors de la création de l'utilisateur", 
+            message: "Erreur lors de la création de l'utilisateur", 
             Erreur: error.message 
         });
     }
@@ -98,7 +98,7 @@ const loginUser = async (req, res) => {
 
         if (!utilisateur) {
             return res.status(400).json({ 
-                Message: "L'email est invalide" 
+                message: "L'email est invalide" 
             });
         }
         
@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
 
         if (!mot_de_passe_correct) {
             return res.status(401).json({ 
-                Message: "Le mot de passe est incorrect. Veuillez réessayer!"
+                message: "Le mot de passe est incorrect. Veuillez réessayer!"
             });
         }
 
@@ -128,7 +128,7 @@ const loginUser = async (req, res) => {
     }
     catch (error) {
         res.status(500).json({
-            Message: "Erreur lors de la connexion de l'utilisateur",
+            message: "Erreur lors de la connexion de l'utilisateur",
             Erreur: error.message
         });
     }
