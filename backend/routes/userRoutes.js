@@ -6,7 +6,8 @@ const {
 } = require('../controllers/userControllers');
 const {
     sendMessage,
-    getMessages
+    getMessages,
+    getAllUsersExceptMe
 } = require('../controllers/messageControllers');
 const {
     authMiddleware
@@ -47,6 +48,13 @@ router.get(
     '/conversation/:otherUserId', 
     authMiddleware, 
     getMessages
+);
+
+// Route pour récupérer tous les utilisateurs sauf l'utilisateur connecté
+router.get(
+    '/others', 
+    authMiddleware, 
+    getAllUsersExceptMe
 );
 
 module.exports = router;
