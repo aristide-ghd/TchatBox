@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Avatar from "react-avatar";
+import { useNavigate } from "react-router-dom";
 
 export default function Chat() {
   const [users, setUsers] = useState([]);
@@ -10,8 +11,17 @@ export default function Chat() {
   const [loadingMessages, setLoadingMessages] = useState(false);
 
   const token = localStorage.getItem("token");
-//   const pseudo = localStorage.getItem("pseudo");
+  const pseudo = localStorage.getItem("pseudo");
+  const navigate = useNavigate();
 
+  // Déconnexion
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("pseudo");
+    navigate("/");
+  };
+
+  // Charger la liste des autres utilisateurs
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/users/others", {
@@ -21,14 +31,16 @@ export default function Chat() {
       .catch((err) => console.error("Erreur utilisateurs", err));
   }, [token]);
 
+  // Charger les messages avec un utilisateur
   const loadMessages = async (receiverId) => {
     setLoadingMessages(true);
     setSelectedReceiver(receiverId);
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/users/conversation/${receiverId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `http://localhost:5000/api/users/conversation/${receiverId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setMessages(res.data);
     } catch (err) {
       console.error("Erreur messages", err);
@@ -37,37 +49,34 @@ export default function Chat() {
     setLoadingMessages(false);
   };
 
+  // Envoyer un message
   const handleSend = async () => {
-  if (!content.trim()) return; // pas envoyer message vide
-
-  console.log("Envoi du message:", content);
-
-  try {
+    if (!content.trim()) return;
     if (!selectedReceiver) {
-        alert("Veuillez sélectionner un contact avant d'envoyer un message.");
-        return;
+      alert("Veuillez sélectionner un contact avant d'envoyer un message.");
+      return;
     }
 
-    await axios.post(
-      "http://localhost:5000/api/users/send",
-      { receiverId: selectedReceiver, content },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setContent("");
-    await loadMessages(selectedReceiver); // rafraîchir les messages après envoi
-  } catch (err) {
-    console.error("Erreur envoi message:", err.response?.data || err.message);
-    alert("Erreur lors de l'envoi du message");
-  }
-};
-
+    try {
+      await axios.post(
+        "http://localhost:5000/api/users/send",
+        { receiverId: selectedReceiver, content },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setContent("");
+      await loadMessages(selectedReceiver); // Rafraîchir les messages
+    } catch (err) {
+      console.error("Erreur envoi message:", err.response?.data || err.message);
+      alert("Erreur lors de l'envoi du message");
+    }
+  };
 
   const getReceiverInfo = () => users.find((u) => u._id === selectedReceiver);
 
   return (
     <div className="container-fluid vh-100">
       <div className="row h-100">
-        {/* Utilisateurs */}
+        {/* Colonne des utilisateurs */}
         <div className="col-md-3 bg-light border-end p-3 overflow-auto">
           <h5 className="mb-3 text-primary">Contacts</h5>
           {users.map((user) => (
@@ -90,7 +99,7 @@ export default function Chat() {
           ))}
         </div>
 
-        {/* Messages */}
+        {/* Colonne de messages */}
         <div className="col-md-9 d-flex flex-column p-0">
           {/* En-tête de conversation */}
           <div className="bg-primary text-white p-3 d-flex align-items-center">
@@ -107,10 +116,20 @@ export default function Chat() {
             ) : (
               <h6 className="m-0">Sélectionnez un contact pour discuter</h6>
             )}
+
+            <div className="ms-auto d-flex align-items-center">
+              <span className="me-3 small">Connecté en tant que <strong>{pseudo}</strong></span>
+              <button
+                className="btn btn-outline-light btn-sm"
+                onClick={handleLogout}
+              >
+                Déconnexion
+              </button>
+            </div>
           </div>
 
           {/* Zone des messages */}
-          <div className="flex-grow-1 p-3 bg-light overflow-auto" style={{ height: "0px" }}>
+          <div className="flex-grow-1 p-3 bg-light overflow-auto">
             {loadingMessages ? (
               <p>Chargement des messages...</p>
             ) : (
@@ -118,7 +137,9 @@ export default function Chat() {
                 <div
                   key={msg._id}
                   className={`d-flex mb-2 ${
-                    msg.senderId === selectedReceiver ? "justify-content-start" : "justify-content-end"
+                    msg.senderId === selectedReceiver
+                      ? "justify-content-start"
+                      : "justify-content-end"
                   }`}
                 >
                   <div
@@ -136,7 +157,7 @@ export default function Chat() {
             )}
           </div>
 
-          {/* Champ de saisie */}
+          {/* Zone de saisie */}
           {selectedReceiver && (
             <div className="p-3 border-top d-flex">
               <input
