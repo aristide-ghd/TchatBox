@@ -1,3 +1,4 @@
+require('dns').setServers(['8.8.8.8', '8.8.4.4']);
 // Importer les modules nécessaires
 const express = require('express');
 const connectDB = require('./config/db');

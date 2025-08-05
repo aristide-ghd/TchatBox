@@ -50,26 +50,28 @@ export default function Chat() {
   };
 
   // Envoyer un message
-  const handleSend = async () => {
-    if (!content.trim()) return;
-    if (!selectedReceiver) {
-      alert("Veuillez sélectionner un contact avant d'envoyer un message.");
-      return;
-    }
+const handleSend = async () => {
+  if (!content.trim()) return;
 
-    try {
-      await axios.post(
-        "http://localhost:5000/api/users/send",
-        { receiverId: selectedReceiver, content },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setContent("");
-      await loadMessages(selectedReceiver); // Rafraîchir les messages
-    } catch (err) {
-      console.error("Erreur envoi message:", err.response?.data || err.message);
-      alert("Erreur lors de l'envoi du message");
-    }
-  };
+  try {
+    const res = await axios.post(
+      "http://localhost:5000/api/users/send",
+      { receiverId: selectedReceiver, content },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const nouveauMessage = res.data.data;
+
+    // Ajouter directement le nouveau message à l'état sans recharger tous les messages
+    setMessages((prev) => [...prev, nouveauMessage]);
+
+    setContent("");
+  } catch (err) {
+    console.error("Erreur envoi message:", err.response?.data || err.message);
+    alert("Erreur lors de l'envoi du message");
+  }
+};
+
 
   const getReceiverInfo = () => users.find((u) => u._id === selectedReceiver);
 
