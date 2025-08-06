@@ -15,6 +15,8 @@ export default function LoginRegister() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -140,16 +142,27 @@ export default function LoginRegister() {
             <label htmlFor="motDePasse" className="form-label">
               Mot de passe
             </label>
-            <input
-              id="motDePasse"
-              type="password"
-              name="motDePasse"
-              value={form.motDePasse}
-              onChange={handleChange}
-              className="form-control"
-              placeholder="Mot de passe"
-              required
-            />
+            <div className="input-group">
+              <input
+                id="motDePasse"
+                type={showPassword ? "text" : "password"}
+                name="motDePasse"
+                value={form.motDePasse}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Mot de passe"
+                required
+              />
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
+
           </div>
 
           <button

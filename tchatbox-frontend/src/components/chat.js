@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef} from "react";
 import axios from "axios";
 import Avatar from "react-avatar";
 import { useNavigate } from "react-router-dom";
+
 
 export default function Chat() {
   const [users, setUsers] = useState([]);
@@ -50,37 +51,50 @@ export default function Chat() {
   };
 
   // Envoyer un message
-const handleSend = async () => {
-  if (!content.trim()) return;
+  const handleSend = async () => {
+    if (!content.trim()) return;
 
-  try {
-    const res = await axios.post(
-      "http://localhost:5000/api/users/send",
-      { receiverId: selectedReceiver, content },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/users/send",
+        { receiverId: selectedReceiver, content },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    const nouveauMessage = res.data.data;
+      const nouveauMessage = res.data.data;
 
-    // Ajouter directement le nouveau message à l'état sans recharger tous les messages
-    setMessages((prev) => [...prev, nouveauMessage]);
+      // Ajouter directement le nouveau message à l'état sans recharger tous les messages
+      setMessages((prev) => [...prev, nouveauMessage]);
 
-    setContent("");
-  } catch (err) {
-    console.error("Erreur envoi message:", err.response?.data || err.message);
-    alert("Erreur lors de l'envoi du message");
-  }
-};
+      setContent("");
+    } catch (err) {
+      console.error("Erreur envoi message:", err.response?.data || err.message);
+      alert("Erreur lors de l'envoi du message");
+    }
+  };
+
+  const messagesEndRef = useRef(null); // 🔄 Référence pour le scroll automatique
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // 🔄 Scroll automatique quand les messages changent
 
 
   const getReceiverInfo = () => users.find((u) => u._id === selectedReceiver);
 
   return (
-    <div className="container-fluid vh-100">
-      <div className="row h-100">
-        {/* Colonne des utilisateurs */}
-        <div className="col-md-3 bg-light border-end p-3 overflow-auto">
-          <h5 className="mb-3 text-primary">Contacts</h5>
+  <div className="container-fluid vh-100">
+    <div className="row h-100">
+      {/* Colonne des utilisateurs */}
+      <div className="col-md-3 bg-light border-end d-flex flex-column p-3" style={{ height: '100vh' }}>
+        
+        {/* En-tête Contacts */}
+        <h5 className="mb-3 text-primary">Contacts</h5>
+
+        {/* Liste des utilisateurs scrollable */}
+        <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
           {users.map((user) => (
             <div
               key={user._id}
@@ -101,81 +115,110 @@ const handleSend = async () => {
           ))}
         </div>
 
-        {/* Colonne de messages */}
-        <div className="col-md-9 d-flex flex-column p-0">
-          {/* En-tête de conversation */}
-          <div className="bg-primary text-white p-3 d-flex align-items-center">
-            {selectedReceiver ? (
-              <>
-                <Avatar
-                  name={getReceiverInfo()?.pseudo || "?"}
-                  round
-                  size="40"
-                  className="me-2"
-                />
-                <h6 className="m-0">{getReceiverInfo()?.pseudo}</h6>
-              </>
-            ) : (
-              <h6 className="m-0">Sélectionnez un contact pour discuter</h6>
-            )}
-
-            <div className="ms-auto d-flex align-items-center">
-              <span className="me-3 small">Connecté en tant que <strong>{pseudo}</strong></span>
-              <button
-                className="btn btn-outline-light btn-sm"
-                onClick={handleLogout}
-              >
-                Déconnexion
-              </button>
-            </div>
-          </div>
-
-          {/* Zone des messages */}
-          <div className="flex-grow-1 p-3 bg-light overflow-auto">
-            {loadingMessages ? (
-              <p>Chargement des messages...</p>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className={`d-flex mb-2 ${
-                    msg.senderId === selectedReceiver
-                      ? "justify-content-start"
-                      : "justify-content-end"
-                  }`}
-                >
-                  <div
-                    className={`p-2 rounded-pill ${
-                      msg.senderId === selectedReceiver
-                        ? "bg-secondary text-white"
-                        : "bg-primary text-white"
-                    }`}
-                    style={{ maxWidth: "70%" }}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Zone de saisie */}
-          {selectedReceiver && (
-            <div className="p-3 border-top d-flex">
-              <input
-                type="text"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Écrire un message..."
-                className="form-control me-2"
-              />
-              <button className="btn btn-success" onClick={handleSend}>
-                Envoyer
-              </button>
-            </div>
-          )}
+        {/* Bouton Paramètres fixé en bas */}
+        <div className="mt-3 border-top pt-3">
+          <button
+            className="btn btn-outline-secondary w-100"
+            onClick={() => console.log("Ouvrir les paramètres")}
+          >
+            ⚙️ Paramètres
+          </button>
         </div>
       </div>
+
+
+      {/* Colonne de messages */}
+      <div 
+        className="col-md-9 d-flex flex-column p-0" 
+        style={{ height: "100vh", overflow: "hidden" }}
+        >
+        {/* En-tête de conversation */}
+        <div
+          className="bg-primary text-white p-3 d-flex align-items-center"
+          style={{ flexShrink: 0 }}
+          >
+          {selectedReceiver ? (
+            <>
+              <Avatar
+                name={getReceiverInfo()?.pseudo || "?"}
+                round
+                size="40"
+                className="me-2"
+              />
+              <h6 className="m-0">{getReceiverInfo()?.pseudo}</h6>
+            </>
+          ) : (
+            <h6 className="m-0">Sélectionnez un contact pour discuter</h6>
+          )}
+
+          <div className="ms-auto d-flex align-items-center">
+            <span className="me-3 small">
+              Connecté en tant que <strong>{pseudo}</strong>
+            </span>
+            <button
+              className="btn btn-outline-light btn-sm"
+              onClick={handleLogout}
+            >
+              Déconnexion
+            </button>
+          </div>
+        </div>
+
+        {/* Zone des messages scrollable */}
+        <div
+          className="flex-grow-1 overflow-auto px-3 py-2 bg-light"
+          style={{ minHeight: 0, maxHeight: '100%', overflowY: 'auto' }}
+        >
+          {/* Affichage des messages */}
+          {loadingMessages ? (
+            <p>Chargement des messages...</p>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg._id}
+                className={`d-flex mb-2 ${
+                  msg.senderId === selectedReceiver
+                    ? "justify-content-start"
+                    : "justify-content-end"
+                }`}
+              >
+                <div
+                  className={`p-2 rounded-pill ${
+                    msg.senderId === selectedReceiver
+                      ? "bg-secondary text-white"
+                      : "bg-primary text-white"
+                  }`}
+                  style={{ maxWidth: "70%" }}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Zone de saisie */}
+        {selectedReceiver && (
+          <div
+            className="p-3 border-top d-flex"
+            style={{ flexShrink: 0 }}
+          >
+            <input
+              type="text"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Écrire un message..."
+              className="form-control me-2"
+            />
+            <button className="btn btn-success" onClick={handleSend}>
+              Envoyer
+            </button>
+          </div>
+        )}
+      </div>
     </div>
-  );
+  </div>
+);
+
 }
