@@ -6,18 +6,18 @@ Ce projet est une application de messagerie en temps réel avec :
 - 📝 Inscription et connexion sécurisées (email, pseudo, mot de passe)  
 - 🔐 Authentification via JWT  
 - 💬 Discussion privée entre deux utilisateurs connectés  
-- 📱 Interface simple et responsive avec Tailwind CSS  
+- 📱 Interface simple et responsive avec Bootstrap CSS  
 - ⚙️ Backend Node.js avec Express, Socket.IO et MongoDB (via Mongoose)  
 
 ---
 
 ## 🚀 Fonctionnalités actuelles
 
-1. 👤 Inscription d’un utilisateur avec email, pseudo, mot de passe hashé  
+1. 👤 Inscription d’un utilisateur avec email, pseudo,sexe et mot de passe hashé  
 
 2. 🔑 Connexion avec génération d’un token JWT  
 
-3. 🔒 Protection des routes et connexion Socket.IO via JWT  
+3. 🔒 Protection des routes  
 
 4. 📨 Envoi et réception de messages privés en temps réel entre deux utilisateurs  
 
@@ -35,7 +35,7 @@ Ce projet est une application de messagerie en temps réel avec :
 
 - jsonwebtoken pour la gestion des tokens JWT  
 
-- Tailwind CSS pour le frontend  
+- Bootstrap CSS pour le frontend  
 
 ---
 
@@ -70,8 +70,6 @@ nodemon server.js
 ---
 
 ## 🎯 Objectifs à venir
-
-- Ajouter l’historique des messages  
 
 - Améliorer l’interface utilisateur  
 
