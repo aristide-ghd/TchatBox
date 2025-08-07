@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api/users";
+const API_URL = `${process.env.REACT_APP_API_URL}/api/users`;
 
 export default function LoginRegister() {
   const [isLogin, setIsLogin] = useState(true);
@@ -159,10 +159,10 @@ export default function LoginRegister() {
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
-                {showPassword ? "🙈" : "👁️"}
+                <i className={`bi ${showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"}`}></i>
+                {/* {showPassword ? "🙈" : "👁️"} */}
               </button>
             </div>
-
           </div>
 
           <button

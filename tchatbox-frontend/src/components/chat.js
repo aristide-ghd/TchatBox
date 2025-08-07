@@ -25,7 +25,7 @@ export default function Chat() {
   // Charger la liste des autres utilisateurs
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users/others", {
+      .get(`${process.env.REACT_APP_API_URL}/api/users/others`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUsers(res.data))
@@ -39,7 +39,7 @@ export default function Chat() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/users/conversation/${receiverId}`,
+        `${process.env.REACT_APP_API_URL}/api/users/conversation/${receiverId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessages(res.data);
@@ -56,7 +56,7 @@ export default function Chat() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/users/send",
+        `${process.env.REACT_APP_API_URL}/api/users/send`,
         { receiverId: selectedReceiver, content },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -88,7 +88,9 @@ export default function Chat() {
   <div className="container-fluid vh-100">
     <div className="row h-100">
       {/* Colonne des utilisateurs */}
-      <div className="col-md-3 bg-light border-end d-flex flex-column p-3" style={{ height: '100vh' }}>
+      <div className="col-md-3 bg-light border-end d-flex flex-column p-3" 
+        style={{ height: '100vh' }}
+        >
         
         {/* En-tête Contacts */}
         <h5 className="mb-3 text-primary">Contacts</h5>
@@ -97,13 +99,13 @@ export default function Chat() {
         <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
           {users.map((user) => (
             <div
-              key={user._id}
-              className={`d-flex align-items-center p-2 rounded mb-2 ${
-                selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
-              }`}
-              style={{ cursor: "pointer", transition: "0.3s" }}
-              onClick={() => loadMessages(user._id)}
-            >
+                key={user._id}
+                className={`d-flex align-items-center p-2 rounded mb-2 ${
+                  selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
+                }`}
+                style={{ cursor: "pointer", transition: "0.3s" }}
+                onClick={() => loadMessages(user._id)}
+              >
               <Avatar name={user.pseudo} round size="40" className="me-2" />
               <div>
                 <strong>{user.pseudo}</strong>
@@ -121,7 +123,7 @@ export default function Chat() {
             className="btn btn-outline-secondary w-100"
             onClick={() => console.log("Ouvrir les paramètres")}
           >
-            ⚙️ Paramètres
+            <i className="bi bi-gear-fill me-2"></i>Paramètres
           </button>
         </div>
       </div>
