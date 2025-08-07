@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef} from "react";
 import axios from "axios";
 import Avatar from "react-avatar";
 import { useNavigate } from "react-router-dom";
+import ParametresModal from "./parametresModal";
 
-
-export default function Chat() {
+export default function ChatR() {
   const [users, setUsers] = useState([]);
   const [selectedReceiver, setSelectedReceiver] = useState(null);
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [showParams, setShowParams] = useState(false);
 
   const token = localStorage.getItem("token");
   const pseudo = localStorage.getItem("pseudo");
@@ -63,7 +64,6 @@ export default function Chat() {
 
       const nouveauMessage = res.data.data;
 
-      // Ajouter directement le nouveau message à l'état sans recharger tous les messages
       setMessages((prev) => [...prev, nouveauMessage]);
 
       setContent("");
@@ -73,154 +73,171 @@ export default function Chat() {
     }
   };
 
-  const messagesEndRef = useRef(null); // 🔄 Référence pour le scroll automatique
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]); // 🔄 Scroll automatique quand les messages changent
-
+  }, [messages]);
 
   const getReceiverInfo = () => users.find((u) => u._id === selectedReceiver);
 
   return (
-  <div className="container-fluid vh-100">
-    <div className="row h-100">
-      {/* Colonne des utilisateurs */}
-      <div className="col-md-3 bg-light border-end d-flex flex-column p-3" 
-        style={{ height: '100vh' }}
-        >
-        
-        {/* En-tête Contacts */}
-        <h5 className="mb-3 text-primary">Contacts</h5>
+    <div className="container-fluid vh-100">
+      <div className="row h-100">
 
-        {/* Liste des utilisateurs scrollable */}
-        <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-          {users.map((user) => (
-            <div
-                key={user._id}
-                className={`d-flex align-items-center p-2 rounded mb-2 ${
-                  selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
-                }`}
-                style={{ cursor: "pointer", transition: "0.3s" }}
-                onClick={() => loadMessages(user._id)}
-              >
-              <Avatar name={user.pseudo} round size="40" className="me-2" />
-              <div>
-                <strong>{user.pseudo}</strong>
-                <div style={{ fontSize: "0.8rem" }} className="text-muted">
-                  {user.email}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Bouton Paramètres fixé en bas */}
-        <div className="mt-3 border-top pt-3">
-          <button
-            className="btn btn-outline-secondary w-100"
-            onClick={() => console.log("Ouvrir les paramètres")}
-          >
-            <i className="bi bi-gear-fill me-2"></i>Paramètres
-          </button>
-        </div>
-      </div>
-
-
-      {/* Colonne de messages */}
-      <div 
-        className="col-md-9 d-flex flex-column p-0" 
-        style={{ height: "100vh", overflow: "hidden" }}
-        >
-        {/* En-tête de conversation */}
+        {/* Colonne des utilisateurs */}
         <div
-          className="bg-primary text-white p-3 d-flex align-items-center"
-          style={{ flexShrink: 0 }}
-          >
-          {selectedReceiver ? (
-            <>
-              <Avatar
-                name={getReceiverInfo()?.pseudo || "?"}
-                round
-                size="40"
-                className="me-2"
-              />
-              <h6 className="m-0">{getReceiverInfo()?.pseudo}</h6>
-            </>
-          ) : (
-            <h6 className="m-0">Sélectionnez un contact pour discuter</h6>
-          )}
-
-          <div className="ms-auto d-flex align-items-center">
-            <span className="me-3 small">
-              Connecté en tant que <strong>{pseudo}</strong>
-            </span>
-            <button
-              className="btn btn-outline-light btn-sm"
-              onClick={handleLogout}
+            className={`col-12 col-md-3 bg-light border-end d-flex flex-column p-3
+                ${selectedReceiver ? "d-none d-md-flex" : ""}`}
+            style={{ height: "100vh", }}
             >
-              Déconnexion
-            </button>
-          </div>
-        </div>
+            {/* En-tête fixe */}
+            <div className="d-flex sticky-top bg-light pt-3 mt-0">
+                <h5 className="mb-3 text-primary">Contacts</h5>
+            </div>
 
-        {/* Zone des messages scrollable */}
-        <div
-          className="flex-grow-1 overflow-auto px-3 py-2 bg-light"
-          style={{ minHeight: 0, maxHeight: '100%', overflowY: 'auto' }}
-        >
-          {/* Affichage des messages */}
-          {loadingMessages ? (
-            <p>Chargement des messages...</p>
-          ) : (
-            messages.map((msg) => (
-              <div
-                key={msg._id}
-                className={`d-flex mb-2 ${
-                  msg.senderId === selectedReceiver
-                    ? "justify-content-start"
-                    : "justify-content-end"
-                }`}
-              >
-                <div
-                  className={`p-2 rounded-pill ${
-                    msg.senderId === selectedReceiver
-                      ? "bg-secondary text-white"
-                      : "bg-primary text-white"
-                  }`}
-                  style={{ maxWidth: "70%" }}
+            {/* Liste scrollable */}
+            <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+                {users.map((user) => (
+                    <div
+                        key={user._id}
+                        className={`d-flex align-items-center p-2 rounded mb-2 ${
+                            selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
+                        }`}
+                        style={{ cursor: "pointer", transition: "0.3s" }}
+                        onClick={() => loadMessages(user._id)}
+                        >
+                        <Avatar name={user.pseudo} round size="40" className="me-2" />
+                        <div>
+                            <strong>{user.pseudo}</strong>
+                            <div style={{ fontSize: "0.8rem" }} className="text-muted">
+                                {user.email}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Bouton Paramètres */}
+            <div className="mt-3 border-top pt-3 d-flex sticky-bottom bg-light">
+                <button
+                className="btn btn-outline-secondary w-100"
+                onClick={() => setShowParams(true)}
                 >
-                  {msg.content}
-                </div>
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
+                <i className="bi bi-gear-fill me-2"></i>Paramètres
+                </button>
+            </div>
         </div>
 
-        {/* Zone de saisie */}
-        {selectedReceiver && (
-          <div
-            className="p-3 border-top d-flex"
-            style={{ flexShrink: 0 }}
-          >
-            <input
-              type="text"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Écrire un message..."
-              className="form-control me-2"
-            />
-            <button className="btn btn-success" onClick={handleSend}>
-              Envoyer
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-);
+        {/* Colonne de messages */}
+        <div
+          className={`col-12 col-md-9 d-flex flex-column p-0
+            ${!selectedReceiver ? "d-none d-md-flex" : ""}`}
+          style={{ height: "100vh" }}
+            >
+            {/* En-tête de conversation */}
+            <div
+                className="bg-primary text-white p-3 d-flex align-items-center sticky-top"
+                style={{ flexShrink: 0, zIndex: 1000}}
+                >
+                {selectedReceiver && (
+                    <button
+                    className="btn btn-sm me d-md-none"
+                    onClick={() => setSelectedReceiver(null)}
+                    aria-label="Retour"
+                    style={{ fontSize: '1rem', fontWeight: '200', color: 'white' }}
+                    >
+                    ❮
+                    </button>
+                )}
 
+                {selectedReceiver ? (
+                <>
+                    <Avatar
+                    name={getReceiverInfo()?.pseudo || "?"}
+                    round
+                    size="40"
+                    className="me-2"
+                    />
+                    <h6 className="m-0">{getReceiverInfo()?.pseudo}</h6>
+                </>
+                ) : (
+                    <h6 className="m-0">Sélectionnez un contact pour discuter</h6>
+                )}
+
+                <div className="ms-auto d-flex align-items-center">
+                    <span className="me-3 small d-none d-md-inline">
+                        Connecté en tant que <strong>{pseudo}</strong>
+                    </span>
+                    <button
+                        className="btn btn-outline-light btn-sm"
+                        onClick={handleLogout}
+                    >
+                        Déconnexion
+                    </button>
+                </div>
+            </div>
+
+            {/* Zone des messages scrollable */}
+            <div
+                className="flex-grow-1 overflow-auto px-3 py-2 bg-light"
+                style={{ minHeight: 0, maxHeight: "100%", overflowY: "auto" }}
+                >
+                {loadingMessages ? (
+                <p>Chargement des messages...</p>
+                ) : (
+                messages.map((msg) => (
+                    <div
+                    key={msg._id}
+                    className={`d-flex mb-2 ${
+                        msg.senderId === selectedReceiver
+                        ? "justify-content-start"
+                        : "justify-content-end"
+                    }`}
+                    >
+                    <div
+                        className={`p-2 rounded-pill ${
+                        msg.senderId === selectedReceiver
+                            ? "bg-secondary text-white"
+                            : "bg-primary text-white"
+                        }`}
+                        style={{ maxWidth: "70%" }}
+                    >
+                        {msg.content}
+                    </div>
+                    </div>
+                ))
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Zone de saisie */}
+            {selectedReceiver && (
+                <div className="p-3 border-top d-flex sticky-bottom bg-light" style={{ flexShrink: 0 }}>
+                    <input
+                        type="text"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        placeholder="Écrire un message..."
+                        className="form-control me-2"
+                    />
+                    <button className="btn btn-success" onClick={handleSend}>
+                        Envoyer
+                    </button>
+                </div>
+            )}
+        </div>
+    </div>
+
+      {/* MODAL des paramètres */}
+      <ParametresModal
+        show={showParams}
+        handleClose={() => setShowParams(false)}
+        pseudo={pseudo}
+        handleLogout={handleLogout}
+      />
+    </div>
+  );
 }

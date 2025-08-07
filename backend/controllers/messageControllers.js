@@ -98,13 +98,18 @@ const getMessages = async (req, res) => {
 };
 
 
-// Exemple dans userController.js
+// Recuperer tout les utilisateurs en dehors de celui connecté
 const getAllUsersExceptMe = async (req, res) => {
   try {
-    const users = await Utilisateur.find({ _id: { $ne: req.user.identity._id } }, 'pseudo email _id');
+    const users = await Utilisateur.find(
+      { _id: { $ne: req.user.identity._id } }, 
+      'pseudo email _id'
+    );
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
+    res.status(500).json({ 
+      message: "Erreur lors de la récupération des utilisateurs" 
+    });
   }
 };
 

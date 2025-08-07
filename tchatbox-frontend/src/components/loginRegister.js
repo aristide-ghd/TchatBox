@@ -51,7 +51,7 @@ export default function LoginRegister() {
           setSuccess("Connexion réussie ! Vous serez redirigé vers la messagerie...");
           
           setTimeout(() => {
-            navigate("/chat");
+            navigate("/chatR");
           }, 3000); // délai de 2 secondes
         }
       } else {
