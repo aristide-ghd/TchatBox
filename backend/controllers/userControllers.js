@@ -93,6 +93,12 @@ const loginUser = async (req, res) => {
         // Recuperer l'email et le mot de passe depuis le corps de la requete
         const { email, motDePasse} = req.body;
 
+        if (!email || !motDePasse) {
+            return res.status(400).json({
+                message: "Tous les champs doivent être remplis"
+            })
+        }
+
         // Verifier si l'email existe dans la base de données
         const utilisateur = await Utilisateur.findOne({email});
 

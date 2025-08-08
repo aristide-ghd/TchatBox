@@ -7,27 +7,28 @@ const userDto = object({
       .required('Le pseudo est requis'),
 
     email: string()
-      .email('L\'email est invalide')
-      .required('L\'email est requis'),
+      .required('L\'email est requis')
+      .email('L\'email est invalide'),
 
     motDePasse: string()
-      .min(6, 'Le mot de passe doit contenir au moins 6 caractères')
-      .nullable(),
+      .required('Le mot de passe est requis')
+      .min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
       
     sexe: string()
-      .oneOf(['Homme', 'Femme'])
-      .required('Le sexe est requis'),
+      .required('Le sexe est requis')
+      .oneOf(['Homme', 'Femme']),
   }),
 });
 
 const connexionDto = object({
     body: object({
         email: string()
-            .email('L\'email est invalide')
-            .required('L\'email est requis'),
+          .required('L\'email est requis')
+          .email('L\'email est invalide'),
+
         motDePasse: string()
-            .min(6, 'Le mot de passe doit contenir au moins 6 caractères')
-            .required('Le mot de passe est requis'),
+          .required('Le mot de passe est requis')
+          .min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
     }),
 });
 

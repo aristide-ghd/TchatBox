@@ -85,7 +85,7 @@ export default function ChatR() {
 
   return (
     <div className="container-fluid vh-100">
-      <div className="row h-100">
+      <div className="row h-100 bg-primary">
 
         {/* Colonne des utilisateurs */}
         <div
@@ -93,31 +93,51 @@ export default function ChatR() {
                 ${selectedReceiver ? "d-none d-md-flex" : ""}`}
             style={{ height: "100vh", }}
             >
-            {/* En-tête fixe */}
+            {/* Nom de la mesagerie */}
+            <div className="sticky-top bg-white shadow-sm py-3 border-bottom">
+              <div className="container">
+                <div className="row justify-content-center">
+                  <div className="col-auto">
+                    <h1 className="m-0 fw-bold text-primary d-flex align-items-center gap-2">
+                      <span role="img" aria-label="logo" style={{ fontSize: '1.8rem' }}>💬</span>
+                      TchatBox
+                    </h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* titre  */}
             <div className="d-flex sticky-top bg-light pt-3 mt-0">
-                <h5 className="mb-3 text-primary">Contacts</h5>
+              <h5 className="mb-3 text-primary">Liste des contacts</h5>
             </div>
 
             {/* Liste scrollable */}
             <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-                {users.map((user) => (
-                    <div
-                        key={user._id}
-                        className={`d-flex align-items-center p-2 rounded mb-2 ${
-                            selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
-                        }`}
-                        style={{ cursor: "pointer", transition: "0.3s" }}
-                        onClick={() => loadMessages(user._id)}
-                        >
-                        <Avatar name={user.pseudo} round size="40" className="me-2" />
-                        <div>
-                            <strong>{user.pseudo}</strong>
-                            <div style={{ fontSize: "0.8rem" }} className="text-muted">
-                                {user.email}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+              {/* Message info mobile */}
+              {window.innerWidth <= 768 && !selectedReceiver && (
+                <div className="alert alert-info text-center py-2 small">
+                  Sélectionnez un contact pour discuter
+                </div>
+              )}
+              {users.map((user) => (
+                  <div
+                      key={user._id}
+                      className={`d-flex align-items-center p-2 rounded mb-2 ${
+                          selectedReceiver === user._id ? "bg-primary text-white" : "bg-white"
+                      }`}
+                      style={{ cursor: "pointer", transition: "0.3s" }}
+                      onClick={() => loadMessages(user._id)}
+                      >
+                      <Avatar name={user.pseudo} round size="40" className="me-2" />
+                      <div>
+                          <strong>{user.pseudo}</strong>
+                          <div style={{ fontSize: "0.8rem" }} className="text-muted">
+                              {user.email}
+                          </div>
+                      </div>
+                  </div>
+              ))}
             </div>
 
             {/* Bouton Paramètres */}
