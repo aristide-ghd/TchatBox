@@ -1,0 +1,42 @@
+/* chat.css */
+.settings-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Largeur par défaut pour mobile */
+  z-index: 1000;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  
+  /* Optimisations pour mobile */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  
+  /* Transition douce pour les changements de taille */
+  transition: width 0.3s ease;
+}
+
+/* Version PC - s'applique à partir de 768px */
+@media (min-width: 768px) {
+  .settings-footer {
+    width: 25%; /* Largeur de la sidebar */
+    max-width: 340px; /* Largeur maximale */
+  }
+}
+
+/* Style du bouton */
+.settings-footer .settings-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
+  border: none;
+}
+
+.settings-footer .settings-btn:hover {
+  background-color: #f0f0f0;
+}

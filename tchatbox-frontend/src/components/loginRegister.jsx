@@ -48,7 +48,7 @@ export default function LoginRegister() {
         setToast({ message: "Connexion réussie ! Vous serez redirigé...", type: "success" });
 
         setTimeout(() => {
-          navigate("/accueil");
+          navigate("/chat");
         }, 3000);
       }
     } else {
@@ -69,14 +69,13 @@ return (
     <div className="card shadow-lg overflow-hidden" 
       style={{ maxWidth: "900px", width: "95%" }}>
       <div className="row g-0">
-
         {toast && (
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast(null)}
-      />
-    )}
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
         
         {/* Colonne image */}
         <div className="col-md-6 d-none d-md-block bg-light bg-opacity-10">
